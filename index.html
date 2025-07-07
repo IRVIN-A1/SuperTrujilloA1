@@ -3,28 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <title>Mini Mario Web</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <!-- Pantalla de inicio -->
-  <div id="pantalla-inicio" style="
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    font-family: sans-serif;
-    z-index: 1000;
-  ">
-    <p style="font-size: 1.2rem; max-width: 600px;">
-      Este juego fue desarrollado por <strong>Irvin</strong>, seguidor de la página de nombre largo, un saludo a mis amigos <strong>Trujillos</strong> y a todos los <strong>Unificadores</strong>.
-    </p>
-    <button id="btn-comenzar" style="
+  <style>
+    #player {
+      position: absolute;
+      width: 40px;
+      height: 50px;
+      background-image: url('https://i.imgur.com/5MbcRjT.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      bottom: 0;
+      left: 100px;
+    }
+
+    .platform {
+      position: absolute;
+      width: 120px;
+      height: 20px;
+      background: brown;
+    }
+
+    .hongo {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-image: url('https://i.imgur.com/sWwCZOr.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .enemigo {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-image: url('https://i.imgur.com/0BAvwcn.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .moneda {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('https://i.imgur.com/kNXM9QY.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    #rescatado {
+      position: absolute;
+      width: 40px;
+      height: 50px;
+      background-image: url('https://i.imgur.com/oGoO3Wy.jpeg');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    #pantalla-inicio {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      font-family: sans-serif;
+      z-index: 1000;
+    }
+
+    #btn-comenzar {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 1.1rem;
@@ -33,7 +82,17 @@
       border-radius: 5px;
       background: #28a745;
       color: white;
-    ">Comenzar juego</button>
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Pantalla de inicio -->
+  <div id="pantalla-inicio">
+    <p style="font-size: 1.2rem; max-width: 600px;">
+      Este juego fue desarrollado por <strong>Irvin</strong>, seguidor de la página de nombre largo, un saludo a mis amigos <strong>Trujillos</strong> y a todos los <strong>Unificadores</strong>.
+    </p>
+    <button id="btn-comenzar">Comenzar juego</button>
   </div>
 
   <div id="game">
@@ -50,6 +109,77 @@
     <div id="rescatado" style="left: 850px; bottom: 70px;"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const player = document.getElementById('player');
+    const game = document.getElementById('game');
+    const rescatado = document.getElementById('rescatado');
+
+    let posX = 100;
+    let posY = 0;
+    let velocityY = 0;
+    let isJumping = false;
+    let keys = {};
+    let gameStarted = false;
+
+    document.addEventListener('keydown', (e) => {
+      if (gameStarted) keys[e.code] = true;
+    });
+    document.addEventListener('keyup', (e) => {
+      if (gameStarted) keys[e.code] = false;
+    });
+
+    function checkRescate() {
+      const playerRect = player.getBoundingClientRect();
+      const rescatadoRect = rescatado.getBoundingClientRect();
+
+      if (
+        playerRect.right > rescatadoRect.left &&
+        playerRect.left < rescatadoRect.right &&
+        playerRect.bottom > rescatadoRect.top &&
+        playerRect.top < rescatadoRect.bottom
+      ) {
+        alert('¡Rescataste a Moon!');
+        gameStarted = false;
+      }
+    }
+
+    function gameLoop() {
+      if (!gameStarted) return;
+
+      if (keys['ArrowRight']) posX += 4;
+      if (keys['ArrowLeft']) posX -= 4;
+
+      velocityY += 1.2;
+      posY -= velocityY;
+
+      if (posY < 0) {
+        posY = 0;
+        velocityY = 0;
+        isJumping = false;
+      }
+
+      if (keys['Space'] && !isJumping) {
+        velocityY = -18;
+        isJumping = true;
+      }
+
+      player.style.left = posX + 'px';
+      player.style.bottom = posY + 'px';
+
+      checkRescate();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    const pantallaInicio = document.getElementById('pantalla-inicio');
+    const btnComenzar = document.getElementById('btn-comenzar');
+
+    btnComenzar.addEventListener('click', () => {
+      pantallaInicio.style.display = 'none';
+      gameStarted = true;
+      gameLoop();
+    });
+  </script>
 </body>
 </html>
+
