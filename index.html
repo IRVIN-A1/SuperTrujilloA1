@@ -1,187 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mini Mario Web</title>
+  <meta charset="UTF-8">
+  <title>Mini Mario Canvas 1-1 Clon</title>
   <style>
-    #player {
-      position: absolute;
-      width: 40px;
-      height: 50px;
-      background-image: url('https://i.imgur.com/5MbcRjT.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      bottom: 0;
-      left: 100px;
-    }
-
-    .platform {
-      position: absolute;
-      width: 120px;
-      height: 20px;
-      background: brown;
-    }
-
-    .hongo {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background-image: url('https://i.imgur.com/sWwCZOr.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-    }
-
-    .enemigo {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background-image: url('https://i.imgur.com/0BAvwcn.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-    }
-
-    .moneda {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-image: url('https://i.imgur.com/kNXM9QY.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-    }
-
-    #rescatado {
-      position: absolute;
-      width: 40px;
-      height: 50px;
-      background-image: url('https://i.imgur.com/oGoO3Wy.jpeg');
-      background-size: cover;
-      background-repeat: no-repeat;
-    }
-
+    body { margin:0; overflow:hidden; }
     #pantalla-inicio {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      font-family: sans-serif;
-      z-index: 1000;
+      position:fixed; top:0; left:0; width:100vw; height:100vh;
+      background:rgba(0,0,0,0.8); color:#fff;
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      text-align:center; padding:20px; font-family:sans-serif; z-index:1000;
     }
-
     #btn-comenzar {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #28a745;
-      color: white;
+      margin-top:20px; padding:10px 20px; font-size:1.1rem;
+      background:#28a745; border:none; border-radius:5px; color:#fff; cursor:pointer;
     }
-
+    canvas { display:block; }
   </style>
 </head>
 <body>
-  <!-- Pantalla de inicio -->
   <div id="pantalla-inicio">
-    <p style="font-size: 1.2rem; max-width: 600px;">
+    <p style="max-width:600px; font-size:1.2rem;">
       Este juego fue desarrollado por <strong>Irvin</strong>, seguidor de la página de nombre largo, un saludo a mis amigos <strong>Trujillos</strong> y a todos los <strong>Unificadores</strong>.
     </p>
     <button id="btn-comenzar">Comenzar juego</button>
   </div>
-
-  <div id="game">
-    <div id="player"></div>
-    <div class="platform" style="bottom: 0; left: 0; width: 100%;"></div>
-    <div class="platform" style="bottom: 150px; left: 200px;"></div>
-    <div class="platform" style="bottom: 300px; left: 400px;"></div>
-
-    <div class="hongo" style="left: 250px; bottom: 70px;"></div>
-    <div class="enemigo" style="left: 500px; bottom: 70px;"></div>
-    <div class="enemigo" style="left: 700px; bottom: 70px; background-image: url('https://i.imgur.com/GxpZ3OI.png');"></div>
-    <div class="moneda" style="left: 320px; bottom: 160px;"></div>
-
-    <div id="rescatado" style="left: 850px; bottom: 70px;"></div>
-  </div>
-
+  <canvas id="gameCanvas"></canvas>
   <script>
-    const player = document.getElementById('player');
-    const game = document.getElementById('game');
-    const rescatado = document.getElementById('rescatado');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = window.innerWidth, height = window.innerHeight;
+    canvas.width = width; canvas.height = height;
 
-    let posX = 100;
-    let posY = 0;
-    let velocityY = 0;
-    let isJumping = false;
-    let keys = {};
-    let gameStarted = false;
+    // Tile size y cámara
+    const tileSize = 32;
+    let camX = 0;
 
-    document.addEventListener('keydown', (e) => {
-      if (gameStarted) keys[e.code] = true;
-    });
-    document.addEventListener('keyup', (e) => {
-      if (gameStarted) keys[e.code] = false;
-    });
-
-    function checkRescate() {
-      const playerRect = player.getBoundingClientRect();
-      const rescatadoRect = rescatado.getBoundingClientRect();
-
-      if (
-        playerRect.right > rescatadoRect.left &&
-        playerRect.left < rescatadoRect.right &&
-        playerRect.bottom > rescatadoRect.top &&
-        playerRect.top < rescatadoRect.bottom
-      ) {
-        alert('¡Rescataste a Moon!');
-        gameStarted = false;
-      }
+    // Carga de imágenes
+    const imgs = {};
+    const assets = {
+      ground: 'https://i.imgur.com/ZIerSUG.jpeg', // reuse any
+      brick: 'https://i.imgur.com/ZIerSUG.jpeg',
+      pipe: 'https://i.imgur.com/ZIerSUG.jpeg',
+      hongo: 'https://i.imgur.com/sWwCZOr.png',
+      moneda: 'https://i.imgur.com/kNXM9QY.png',
+      goomba: 'https://i.imgur.com/0BAvwcn.png',
+      koopa: 'https://i.imgur.com/GxpZ3OI.png',
+      mario: 'https://i.imgur.com/5MbcRjT.png',
+      peach: 'https://i.imgur.com/oGoO3Wy.jpeg'
+    };
+    let loaded = 0, total = Object.keys(assets).length;
+    for (let key in assets) {
+      imgs[key] = new Image();
+      imgs[key].src = assets[key];
+      imgs[key].onload = () => { if (++loaded === total) init(); };
     }
 
+    // Mapa nivel 1-1 (string array)
+    // G = ground, B = brick, P = pipe, h = hongo, o = goomba, k = koopa, C = coin, M = peach
+    const level = [
+      '                                                                                ',
+      '                               C C C       C C C                                ',
+      '                               BBB       BBB                                    ',
+      '                                                h                               ',
+      '           o                                                            P P     ',
+      '                          k                                             P P     ',
+      '================================================================================',
+    ];
+
+    // Interpretación del mapa
+    const objects = [];
+    function init() {
+      // Genera colisiones y objetos
+      level.forEach((row, y) => {
+        [...row].forEach((ch, x) => {
+          const px = x * tileSize;
+          const py = y * tileSize;
+          if (ch === '=') objects.push({type:'ground', x:px, y:py});
+          else if (ch === 'B') objects.push({type:'brick', x:px, y:py});
+          else if (ch === 'P') objects.push({type:'pipe', x:px, y:py - tileSize});
+          else if (ch === 'h') objects.push({type:'hongo', x:px, y:py});
+          else if (ch === 'C') objects.push({type:'moneda', x:px + 4, y:py + 4});
+          else if (ch === 'o') objects.push({type:'goomba', x:px, y:py});
+          else if (ch === 'k') objects.push({type:'koopa', x:px, y:py});
+          else if (ch === 'M') objects.push({type:'peach', x:px, y:py});
+        });
+      });
+      player.x = 50; player.y = height - tileSize * 2;
+      gameLoop();
+    }
+
+    // Jugador
+    const player = { x:50, y:0, w:32, h:48, vy:0, jump:false };
+    const keys = {};
+    document.addEventListener('keydown', e=>keys[e.code]=true);
+    document.addEventListener('keyup', e=>keys[e.code]=false);
+
     function gameLoop() {
-      if (!gameStarted) return;
-
-      if (keys['ArrowRight']) posX += 4;
-      if (keys['ArrowLeft']) posX -= 4;
-
-      velocityY += 1.2;
-      posY -= velocityY;
-
-      if (posY < 0) {
-        posY = 0;
-        velocityY = 0;
-        isJumping = false;
+      // Física
+      if (keys.ArrowRight) player.x += 4;
+      if (keys.ArrowLeft) player.x -= 4;
+      if (keys.Space && !player.jump) { player.vy = -12; player.jump = true; }
+      player.vy += 0.5; player.y += player.vy;
+      // Colisión suelo simple
+      if (player.y + player.h > height - tileSize) {
+        player.y = height - tileSize - player.h;
+        player.vy = 0; player.jump = false;
       }
+      // Cámara
+      camX = player.x - width / 2;
 
-      if (keys['Space'] && !isJumping) {
-        velocityY = -18;
-        isJumping = true;
-      }
+      // Dibujado
+      ctx.clearRect(0,0,width,height);
+      ctx.save(); ctx.translate(-camX,0);
+      // Objetos
+      objects.forEach(o=>{
+        if (o.type === 'ground') ctx.drawImage(imgs.ground, o.x, height - tileSize - o.y, tileSize, tileSize);
+        if (o.type === 'brick')  ctx.drawImage(imgs.brick, o.x, height - tileSize - o.y, tileSize, tileSize);
+        if (o.type === 'pipe')   ctx.fillStyle = 'green', ctx.fillRect(o.x, height - tileSize - o.y - tileSize, o.w||tileSize, tileSize*2);
+        if (o.type === 'hongo')  ctx.drawImage(imgs.hongo, o.x, height - tileSize - o.y - 32, 32,32);
+        if (o.type === 'moneda') ctx.drawImage(imgs.moneda, o.x, height - tileSize - o.y - 32, 32,32);
+        if (o.type === 'goomba') ctx.drawImage(imgs.goomba, o.x, height - tileSize - o.y - 32, 32,32);
+        if (o.type === 'koopa')  ctx.drawImage(imgs.koopa , o.x, height - tileSize - o.y - 32, 32,32);
+        if (o.type === 'peach')  ctx.drawImage(imgs.peach , o.x, height - tileSize - o.y - 48, 40,50);
+      });
+      // Jugador
+      ctx.drawImage(imgs.mario, player.x, player.y, player.w, player.h);
+      ctx.restore();
 
-      player.style.left = posX + 'px';
-      player.style.bottom = posY + 'px';
-
-      checkRescate();
+      // Check rescue
+      const peach = objects.find(o=>o.type==='peach');
+      if (peach && player.x > peach.x) return alert('¡Rescataste a Moon!');
 
       requestAnimationFrame(gameLoop);
     }
 
-    const pantallaInicio = document.getElementById('pantalla-inicio');
-    const btnComenzar = document.getElementById('btn-comenzar');
-
-    btnComenzar.addEventListener('click', () => {
-      pantallaInicio.style.display = 'none';
-      gameStarted = true;
-      gameLoop();
-    });
+    // Botón comenzar juego
+    document.getElementById('btn-comenzar').onclick = () => {
+      document.getElementById('pantalla-inicio').style.display = 'none';
+      init();
+    };
   </script>
 </body>
 </html>
+
 
 
 
