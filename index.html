@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Mario Web</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Pantalla de inicio -->
+  <div id="pantalla-inicio" style="
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    font-family: sans-serif;
+    z-index: 1000;
+  ">
+    <p style="font-size: 1.2rem; max-width: 600px;">
+      Este juego fue desarrollado por <strong>Irvin</strong>, seguidor de la página de nombre largo, un saludo a mis amigos <strong>Trujillos</strong> y a todos los <strong>Unificadores</strong>.
+    </p>
+    <button id="btn-comenzar" style="
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #28a745;
+      color: white;
+    ">Comenzar juego</button>
+  </div>
+
+  <div id="game">
+    <div id="player"></div>
+    <div class="platform" style="bottom: 0; left: 0; width: 100%;"></div>
+    <div class="platform" style="bottom: 150px; left: 200px;"></div>
+    <div class="platform" style="bottom: 300px; left: 400px;"></div>
+
+    <div class="hongo" style="left: 250px; bottom: 70px;"></div>
+    <div class="enemigo" style="left: 500px; bottom: 70px;"></div>
+    <div class="enemigo" style="left: 700px; bottom: 70px; background-image: url('https://i.imgur.com/GxpZ3OI.png');"></div>
+    <div class="moneda" style="left: 320px; bottom: 160px;"></div>
+
+    <div id="rescatado" style="left: 850px; bottom: 70px;"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
