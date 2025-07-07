@@ -4,182 +4,170 @@
   <meta charset="UTF-8" />
   <title>Mini Mario Web</title>
   <style>
-    #player {
-      position: absolute;
-      width: 40px;
-      height: 50px;
-      background-image: url('https://i.imgur.com/5MbcRjT.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      bottom: 0;
-      left: 100px;
+    /* Reset */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { overflow:hidden; font-family:sans-serif; }
+
+    /* Contenedor de juego */
+    #game { 
+      position: relative;
+      width: 2500px;   /* mapa muy ancho */
+      height: 600px;
+      background: linear-gradient(to top, #4ec0ca 0%, #87CEEB 100%);
     }
 
+    /* Player */
+    #player {
+      position: absolute;
+      width: 40px; height: 50px;
+      background-image: url('https://i.imgur.com/5MbcRjT.png');
+      background-size: cover;
+      bottom: 0; left: 100px;
+    }
+
+    /* Plataformas */
     .platform {
       position: absolute;
-      width: 120px;
-      height: 20px;
+      width: 120px; height: 20px;
       background: brown;
     }
 
+    /* Hongo */
     .hongo {
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       background-image: url('https://i.imgur.com/sWwCZOr.png');
       background-size: cover;
-      background-repeat: no-repeat;
     }
 
+    /* Enemigos */
     .enemigo {
       position: absolute;
-      width: 40px;
-      height: 40px;
-      background-image: url('https://i.imgur.com/0BAvwcn.png');
+      width: 40px; height: 40px;
       background-size: cover;
-      background-repeat: no-repeat;
     }
+    .enemigo:nth-of-type(1) { background-image: url('https://i.imgur.com/0BAvwcn.png'); }
+    .enemigo:nth-of-type(2) { background-image: url('https://i.imgur.com/GxpZ3OI.png'); }
 
+    /* Moneda */
     .moneda {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 30px; height: 30px;
       background-image: url('https://i.imgur.com/kNXM9QY.png');
       background-size: cover;
-      background-repeat: no-repeat;
     }
 
+    /* Persona a rescatar */
     #rescatado {
       position: absolute;
-      width: 40px;
-      height: 50px;
+      width: 40px; height: 50px;
       background-image: url('https://i.imgur.com/oGoO3Wy.jpeg');
       background-size: cover;
-      background-repeat: no-repeat;
     }
 
+    /* Pantalla de inicio */
     #pantalla-inicio {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.8);
       color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      font-family: sans-serif;
-      z-index: 1000;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 20px; z-index:1000;
     }
-
     #btn-comenzar {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #28a745;
-      color: white;
+      margin-top:20px; padding:10px 20px;
+      font-size:1.1rem; cursor:pointer;
+      border:none; border-radius:5px;
+      background:#28a745; color:white;
     }
-
   </style>
 </head>
 <body>
   <!-- Pantalla de inicio -->
   <div id="pantalla-inicio">
-    <p style="font-size: 1.2rem; max-width: 600px;">
+    <p style="font-size:1.2rem; max-width:600px;">
       Este juego fue desarrollado por <strong>Irvin</strong>, seguidor de la página de nombre largo, un saludo a mis amigos <strong>Trujillos</strong> y a todos los <strong>Unificadores</strong>.
     </p>
     <button id="btn-comenzar">Comenzar juego</button>
   </div>
 
-  <div id="game">
-    <div id="player"></div>
-    <div class="platform" style="bottom: 0; left: 0; width: 100%;"></div>
-    <div class="platform" style="bottom: 150px; left: 200px;"></div>
-    <div class="platform" style="bottom: 300px; left: 400px;"></div>
+  <!-- Wrapper para centrar la cámara -->
+  <div id="viewport" style="width:100vw; height:100vh; overflow:hidden; position:relative;">
+    <div id="game">
+      <div id="player"></div>
 
-    <div class="hongo" style="left: 250px; bottom: 70px;"></div>
-    <div class="enemigo" style="left: 500px; bottom: 70px;"></div>
-    <div class="enemigo" style="left: 700px; bottom: 70px; background-image: url('https://i.imgur.com/GxpZ3OI.png');"></div>
-    <div class="moneda" style="left: 320px; bottom: 160px;"></div>
+      <!-- Miembro de plataformas para crear long map -->
+      <div class="platform" style="bottom: 0; left:   0;"></div>
+      <div class="platform" style="bottom: 0; left: 120;"></div>
+      <div class="platform" style="bottom: 0; left: 240;"></div>
+      <div class="platform" style="bottom: 0; left: 360;"></div>
+      <div class="platform" style="bottom: 0; left: 480;"></div>
+      <!-- Plataformas aéreas -->
+      <div class="platform" style="bottom: 150px; left: 600;"></div>
+      <div class="platform" style="bottom: 200px; left: 800;"></div>
+      <div class="platform" style="bottom: 100px; left:1000;"></div>
+      <div class="platform" style="bottom: 250px; left:1200;"></div>
+      <div class="platform" style="bottom: 180px; left:1400;"></div>
+      <div class="platform" style="bottom: 220px; left:1600;"></div>
 
-    <div id="rescatado" style="left: 850px; bottom: 70px;"></div>
+      <!-- Objetos repartidos -->
+      <div class="hongo"  style="left: 650px;  bottom: 170px;"></div>
+      <div class="moneda" style="left: 840px;  bottom: 210px;"></div>
+      <div class="moneda" style="left: 860px;  bottom: 210px;"></div>
+      <div class="enemigo" style="left: 900px; bottom: 20px;"></div>
+      <div class="enemigo" style="left:1100px; bottom: 20px;"></div>
+      <div class="moneda" style="left:1300px; bottom: 260px;"></div>
+      <div class="moneda" style="left:1315px; bottom: 260px;"></div>
+
+      <!-- Rescatado al final -->
+      <div id="rescatado" style="left: 2400px; bottom: 20px;"></div>
+    </div>
   </div>
 
   <script>
     const player = document.getElementById('player');
     const game = document.getElementById('game');
     const rescatado = document.getElementById('rescatado');
+    let posX=100, posY=0, velY=0, isJump=false, keys={}, started=false;
 
-    let posX = 100;
-    let posY = 0;
-    let velocityY = 0;
-    let isJumping = false;
-    let keys = {};
-    let gameStarted = false;
+    document.addEventListener('keydown', e=>{ if(started) keys[e.code]=true; });
+    document.addEventListener('keyup',   e=>{ if(started) keys[e.code]=false; });
 
-    document.addEventListener('keydown', (e) => {
-      if (gameStarted) keys[e.code] = true;
-    });
-    document.addEventListener('keyup', (e) => {
-      if (gameStarted) keys[e.code] = false;
-    });
-
-    function checkRescate() {
-      const playerRect = player.getBoundingClientRect();
-      const rescatadoRect = rescatado.getBoundingClientRect();
-
-      if (
-        playerRect.right > rescatadoRect.left &&
-        playerRect.left < rescatadoRect.right &&
-        playerRect.bottom > rescatadoRect.top &&
-        playerRect.top < rescatadoRect.bottom
-      ) {
+    function checkRescate(){
+      const p=player.getBoundingClientRect(), r=rescatado.getBoundingClientRect();
+      if(p.right>r.left && p.left<r.right && p.bottom>r.top && p.top<r.bottom){
         alert('¡Rescataste a Moon!');
-        gameStarted = false;
+        started=false;
       }
     }
 
-    function gameLoop() {
-      if (!gameStarted) return;
-
-      if (keys['ArrowRight']) posX += 4;
-      if (keys['ArrowLeft']) posX -= 4;
-
-      velocityY += 1.2;
-      posY -= velocityY;
-
-      if (posY < 0) {
-        posY = 0;
-        velocityY = 0;
-        isJumping = false;
-      }
-
-      if (keys['Space'] && !isJumping) {
-        velocityY = -18;
-        isJumping = true;
-      }
-
-      player.style.left = posX + 'px';
-      player.style.bottom = posY + 'px';
-
+    function gameLoop(){
+      if(!started) return;
+      // Movimiento
+      if(keys['ArrowRight']) posX+=4;
+      if(keys['ArrowLeft'])  posX-=4;
+      // Gravedad
+      velY+=1.2; posY-=velY;
+      if(posY<0){ posY=0; velY=0; isJump=false; }
+      if(keys['Space'] && !isJump){ velY=-18; isJump=true; }
+      // Aplicar
+      player.style.left=posX+'px';
+      player.style.bottom=posY+'px';
       checkRescate();
-
+      // Cámara
+      const camX = posX - window.innerWidth/2;
+      game.parentElement.scrollTo(camX, 0);
       requestAnimationFrame(gameLoop);
     }
 
-    const pantallaInicio = document.getElementById('pantalla-inicio');
-    const btnComenzar = document.getElementById('btn-comenzar');
-
-    btnComenzar.addEventListener('click', () => {
-      pantallaInicio.style.display = 'none';
-      gameStarted = true;
-      gameLoop();
-    });
+    // Botón inicio
+    document.getElementById('btn-comenzar').onclick = ()=>{
+      document.getElementById('pantalla-inicio').style.display='none';
+      started=true; gameLoop();
+    };
   </script>
 </body>
 </html>
+
 
